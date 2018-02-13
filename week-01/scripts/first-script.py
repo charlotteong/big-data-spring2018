@@ -1,2 +1,2 @@
-msg = "Python is printing me!"
+msg = "STAGE COMMIT PUSH RINSE AND REPEAT"
 print(msg)
