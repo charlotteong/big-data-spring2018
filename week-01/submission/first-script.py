@@ -1,0 +1,2 @@
+msg = "STAGE COMMIT PUSH RINSE AND REPEAT"
+print(msg)
