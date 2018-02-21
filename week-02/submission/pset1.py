@@ -1,15 +1,21 @@
 ## A. LISTS
+
 ## A1. Create a list containing 4 strings
 l_4string = ["this is a string", "and another", "stringing along", "high strung"]
+
 ## A2. Print 3rd item in the list
 print(l_4string[2])
+
 ## A3. Print 1st and 2nd item using index slicing
 print(l_4string[0:2])
+
 ## A4. add a new string with text 'last' and print the list
 l_4string.append("last")
 print(l_4string)
+
 ## A5. get the list length and print it
 print(len(l_4string))
+
 ## A6. replace the last item in the list with the string 'new'
 l_4string.pop()
 l_4string.append("new")
@@ -21,15 +27,19 @@ print(l_4string)
 sentence_words = ['I', 'am', 'learning', 'Python', 'to', 'munge', 'large', 'datasets', 'and', 'visualize', 'them']
 print(' '.join(sentence_words))
 ## credit: http://www.java2s.com/Tutorial/Python/0100__String/JoiningStrings.htm
+
 ##B2. reverse order of the list
 sentence_words.reverse()
 print(sentence_words)
+
 ## B3: sort the list
 sentence_words.sort()
 print(sentence_words)
+
 ## B4. use sorted function
 new_sort_list = sorted(sentence_words)
 print(new_sort_list)
+
 ## sorted() returns a new sorted list and leaves the original list intact.
 ## .sort function sorts the list in place and directly changes the order of the elements in the list.
 
@@ -45,7 +55,6 @@ print(sentence_words)
 from random import randint
 # this returns random integer: 100 <= number <= 1000
 num = randint(100, 1000)
-num
 
 max = 500
 def newrandint(max,min=0):
@@ -122,7 +131,7 @@ def mymin(list1):
     return minz
 
 h = [4, 20, 3, 4, 2, 10, 30, 10]
-mymin(h)
+print(mymin(h))
 
 def mymax(list2):
     maxx = list2[0]
@@ -130,7 +139,8 @@ def mymax(list2):
         if i > maxx:
             maxx = i
     return maxx
-mymax(h)
+
+print(mymax(h))
 
 ## code adopted from Martijn Pieters from (https://stackoverflow.com/questions/30313149/minimum-in-python-without-using-min-function-python-2-7)
 
