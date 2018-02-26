@@ -186,7 +186,11 @@ def get_tweets(
             with open(out_file, 'w') as f:
                 f.write(jsonpickle.encode(tweet._json, unpicklable=False) + '\n')
       max_id = new_tweets[-1].id
+      ## return the last thing in the array
       tweet_count += len(new_tweets)
+      ## adds the number of new tweets
+      ## += is python shorthand for tweet_count = tweet_count + len(new_tweets)
+
     except tweepy.TweepError as e:
       # Just exit if any error
       print("Error : " + str(e))
@@ -212,9 +216,11 @@ get_tweets(
   write = True,
   out_file = file_name
 )
+
 ```
 
 This function will run as is, allowing you to download Tweets to a `.json` file---give it a go! However, we might also want to download it into a more Python-legible format so that we can manipulate it and analyze it.
+## JSON VIEWER (eg. jsonviewer.stack.hu)
 
 ## Parsing Our Tweets
 
@@ -223,6 +229,7 @@ We are going to create a function to parse the result into a Python `Series` tha
 ```python
 def parse_tweet(tweet):
   p = pd.Series()
+  ## series is a one-row data frame
   if tweet.coordinates != None:
     p['lat'] = tweet.coordinates['coordinates'][0]
     p['lon'] = tweet.coordinates['coordinates'][1]
@@ -230,6 +237,7 @@ def parse_tweet(tweet):
     p['lat'] = None
     p['lon'] = None
   p['location'] = tweet.user.location
+  ## this sets a key for each attribute
   p['id'] = tweet.id_str
   p['content'] = tweet.text
   p['user'] = tweet.user.screen_name
@@ -299,11 +307,14 @@ Now let's do some grouping and sorting. We are using Pandas to do our analysis, 
 ```python
 
 loc_tweets = tweets[tweets['location'] != '']
+## limits to tweets that have location specified
 count_tweets = loc_tweets.groupby('location')['id'].count()
+## counts tweets grouping by location
 df_count_tweets = count_tweets.to_frame()
 df_count_tweets
 df_count_tweets.columns
 df_count_tweets.columns = ['count']
+## sets name of the column
 df_count_tweets
 
 df_count_tweets.sort_index()
@@ -352,7 +363,12 @@ You saw above that we had a bunch of locations that were very similar. Here, we 
 
 ```python
 bos_list = tweets[tweets['location'].str.contains("Boston")]['location']
+## creates a mask for the array to pass through. searching for string that contains 'boston'
+print(bos_list)
 tweets['location'].replace(bos_list, 'Boston, MA', inplace = True)
+## this replaces all the things with Boston, MA
+tweets['location'].unique()
+## data has been replaced with more consistent conventions
 ```
 
 To finish cleaning the data, you would want to iteratively follow a similar process until you've cleaned all locations and made them conform to a single convention.
