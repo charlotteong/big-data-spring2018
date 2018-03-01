@@ -100,8 +100,9 @@ Now that you have both a date and a time (stored in a more familiar 24-hour rang
 
 ```python
 
-df['new_hour'] = pd.to_timedelta(df['hour'], unit = 'H')
-df['timestamp'] = df['date'].astype(str) + ' ' + df['new_hour'].astype(str)
+df['new_hour'] = pd.to_timedelta(df['hour'], unit = 'h')
+df['time_stamp'] = df['date_new'] + df['new_hour']
+df['time_stamp'].head()
 
 ```
 
@@ -113,7 +114,7 @@ Create two more graphs. The first should be a **line plot** of **total activity*
 
 ```python
 ## Line Plot of Total Activity
-groupby_timestamp = df.groupby('timestamp')['count']
+groupby_timestamp = df.groupby('time_stamp')['count']
 lineplot = groupby_timestamp.sum()
 lineplot.plot.line(color='b', title='Total GPS Pings by Time')
 
@@ -130,14 +131,16 @@ Pick three times (or time ranges) and use the latitude and longitude to produce 
 
 ```python
 
-print(df['timestamp'])
+print(df['time_stamp'])
 
-Time1 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 14:00:00.000000000')]
-Time1.plot.scatter(x='long', y='lat', s=Time1['count']/20000)
-Time2 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 20:00:00.000000000')]
-Time2.plot.scatter(x='long', y = 'lat', s=Time2['count']/20000)
-Time3 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 08:00:00.000000000')]
-Time3.plot.scatter(x='long', y = 'lat', s=Time3['count']/20000)
+Time1 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 14:00:00')]
+Time1.columns
+Time1.plot.scatter(x='lon', y='lat', s=Time1['count']/5)
+Time2 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 09:00:00')]
+Time2.plot.scatter(x='lon', y='lat', s=Time2['count']/5)
+Time3 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 20:00:00')]
+Time3.plot.scatter(x='lon', y='lat', s=Time3['count']/5)
+
 
 ```
 
@@ -145,15 +148,18 @@ Time3.plot.scatter(x='long', y = 'lat', s=Time3['count']/20000)
 
 For three of the visualizations you produced above, write a one or two paragraph analysis that identifies:
 
-1. A phenomenon that the data make visible (for example, how location services are utilized over the course of a day and why this might by).
+1. A phenomenon that the data make visible (for example, how location services are utilized over the course of a day and why this might be).
 
+At 9am, the GPS pings showing where people are are quite spread out and there are fewer clear discernible clusters. However by 2pm, are are clear clusters created, especially in the downtown Boston area and along major transport corridors. At 8pm, there still is a clear clustering around the downtown Boston area, which is somewhat surprising. There is also a clear cluster along the Back Bay area.
 
 
 
 2. A shortcoming in the completeness of the data that becomes obvious when it is visualized.
-
+It would probably be easier to visualise the data with a basemap. Also the GPS pings would only pick up people with smartphones or rather people with smartphones who have their location tracking services turned on. 
 
 
 
 
 3. How this data could help us identify vulnerabilities related to climate change in the greater Boston area.
+
+The data shows where there are higher concentrations of people throughout the day and helps to identify where population clusters form which we should then use to compare to flood risk maps to see if these overlap and if so to then prioritise these areas.
