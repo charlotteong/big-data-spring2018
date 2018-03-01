@@ -97,12 +97,14 @@ size of dot correspond to GPS pings
 set a mask
 """
 
+###STUCK HERE HELP ###
 
-timestamp_hour = pd.Timestamp(df['new_hour'])
-first_hour = df[(df['timestamp_hour'] == "14:00:00")]
+print(df['timestamp'])
 
-first_hour.plot.scatter(x = df['latitude'], y = df['longitude'], s=df['count']*200)
 
-test = df[(df['new_hour'] == "14:00:00")]
-test_sum = test.groupby(['lat', 'lon'])['count'].sum()
-test_sum.plot.scatter(x=df['lat'] & df['lon'], y=test_sum, s=df['count']*200)
+Time1 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 14:00:00.000000000')]
+Time1.plot.scatter(x='long', y='lat', s=Time1['count']/20000)
+Time2 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 20:00:00.000000000')]
+Time2.plot.scatter(x='long', y = 'lat', s=Time2['count']/20000)
+Time3 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 08:00:00.000000000')]
+Time3.plot.scatter(x='long', y = 'lat', s=Time3['count']/20000)

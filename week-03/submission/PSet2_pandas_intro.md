@@ -130,6 +130,15 @@ Pick three times (or time ranges) and use the latitude and longitude to produce 
 
 ```python
 
+print(df['timestamp'])
+
+Time1 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 14:00:00.000000000')]
+Time1.plot.scatter(x='long', y='lat', s=Time1['count']/20000)
+Time2 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 20:00:00.000000000')]
+Time2.plot.scatter(x='long', y = 'lat', s=Time2['count']/20000)
+Time3 = df[df['timestamp'] == pd.Timestamp('2017-07-04 0 days 08:00:00.000000000')]
+Time3.plot.scatter(x='long', y = 'lat', s=Time3['count']/20000)
+
 ```
 
 ## Problem 6: Analyze Your (Very) Preliminary Findings
