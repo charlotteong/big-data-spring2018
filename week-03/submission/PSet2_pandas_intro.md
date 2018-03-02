@@ -83,10 +83,10 @@ After running your code, you should have either a new column in your DataFrame o
 for i in range(0, 168, 24):
   j = range(0,168,1)[i - 5]
   if (j > i):
-    df['hour'].replace(range(i,i+19,1), range(5,24,1), inplace = True)
-    df['hour'].replace(range(i+163,i+168,1),range(0,5,1), inplace = True)
+    df['hour'].replace(range(j, j + 5, 1), range(-5, 0, 1), inplace=True)
+    df['hour'].replace(range(i, i + 19, 1), range(0, 19, 1), inplace=True)
   else:
-    df['hour'].replace(range(j,i+19,1), range(0,24,1), inplace = True)
+    df['hour'].replace(range(j, j + 24, 1), range(-5, 19, 1), inplace=True)
 
 df['hour'].unique()
 
@@ -138,7 +138,7 @@ Time1.columns
 Time1.plot.scatter(x='lon', y='lat', s=Time1['count']/5)
 Time2 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 09:00:00')]
 Time2.plot.scatter(x='lon', y='lat', s=Time2['count']/5)
-Time3 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 20:00:00')]
+Time3 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 19:00:00')]
 Time3.plot.scatter(x='lon', y='lat', s=Time3['count']/5)
 
 
@@ -150,12 +150,12 @@ For three of the visualizations you produced above, write a one or two paragraph
 
 1. A phenomenon that the data make visible (for example, how location services are utilized over the course of a day and why this might be).
 
-At 9am, the GPS pings showing where people are are quite spread out and there are fewer clear discernible clusters. However by 2pm, are are clear clusters created, especially in the downtown Boston area and along major transport corridors. At 8pm, there still is a clear clustering around the downtown Boston area, which is somewhat surprising. There is also a clear cluster along the Back Bay area.
+At 9am, the GPS pings showing where people are are quite spread out and there are fewer clear discernible clusters. However by 2pm, are are clear clusters created, especially in the downtown Boston area and along major transport corridors. At 7pm, there still is a clear clustering around the downtown Boston area, which is somewhat surprising. There is also a clear cluster along the Back Bay area.
 
 
 
 2. A shortcoming in the completeness of the data that becomes obvious when it is visualized.
-It would probably be easier to visualise the data with a basemap. Also the GPS pings would only pick up people with smartphones or rather people with smartphones who have their location tracking services turned on. 
+It would probably be easier to visualise the data with a basemap. Also the GPS pings would only pick up people with smartphones or rather people with smartphones who have their location tracking services turned on.
 
 
 
