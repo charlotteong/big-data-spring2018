@@ -44,6 +44,10 @@ We'll be doing our coding in Python by reading in a library called `osgeo`. Howe
 
 Mac users will install GDAL from [http://www.kyngchaos.com/software:frameworks](http://www.kyngchaos.com/software:frameworks). Select the most recent version (2.2 at the time of this writing). Install it using the default options. It will probably behoove you to restart your system after you've installed.
 
+import sys
+sys.path.insert(0,'/Library/Frameworks/GDAL.framework/Versions/2.2/Python/3.6/site-packages')
+from osgeo import gdal
+
 ### Windows
 
 From the command line (note: NOT Git Bash), execute either `python` or `python3`, depending on how your system is configured. Take note of the message that appears at the top: it's probably something like:
