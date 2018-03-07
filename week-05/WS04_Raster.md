@@ -1,11 +1,13 @@
 # Working With Rasters in Python: Calculating Vegetation and Land Surface Temperature
 
+![Land Surface Temperature Map](./images/lst_map.png)
+
 Today's agenda
 
 + Download Data
 + A Bit About Landsat
 + Install GDAL
-+ Calculating a Normalized Vegetation Index
++ Calculating a Normalized Difference Vegetation Index
 + Calculating an Estimate of Land Surface Temperature
 
 ## Download Data
@@ -44,9 +46,20 @@ We'll be doing our coding in Python by reading in a library called `osgeo`. Howe
 
 Mac users will install GDAL from [http://www.kyngchaos.com/software:frameworks](http://www.kyngchaos.com/software:frameworks). Select the most recent version (2.2 at the time of this writing). Install it using the default options. It will probably behoove you to restart your system after you've installed.
 
+<<<<<<< HEAD
 import sys
 sys.path.insert(0,'/Library/Frameworks/GDAL.framework/Versions/2.2/Python/3.6/site-packages')
 from osgeo import gdal
+=======
+Once you've installed GDAL from KyngChaos, you'll have to add its location to your Python path. You'll only have to do this once. If you're using your virtual environment (again, we still recommend this), activate it first (`. ~/.venvs/bdvs/bin/activate`). Then open the Python terminal by typing `python`. Then, type the following lines:
+
+```python
+import sys
+sys.path.insert(0,'/Library/Frameworks/GDAL.framework/Versions/2.2/Python/3.6/site-packages')
+```
+
+You (should) only need to do this once.
+>>>>>>> class/master
 
 ### Windows
 
@@ -56,7 +69,7 @@ From the command line (note: NOT Git Bash), execute either `python` or `python3`
 Python 3.6.4 (v3.6.4:d48eceb, Dec 19 2017, 06:04:45) [MSC v.1900 32 bit (Intel)] on win32
 ```
 
-Take note of your Python version (e.g., 3.6.4) and whether you're running 32 bit or 64 bit Python. Quit the Python shell by typing `quit()`. Navigate to [Christoph Gohlke's page](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal) and select the version of GDAL 2.2.3 that corresponds to your Python version and either 32 or 64 bit. For example, based on the message above, I would download `GDAL‑2.2.3‑cp36‑cp36m‑win32.whl` (cp36 refers to my Python version, win32 to the 32-bit Python).
+Take note of your Python version (e.g., 3.6.4) and whether you're running 32 bit or 64 bit Python. Quit the Python shell by typing `quit()`. Navigate to [Christoph Gohlke's page](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal) and select the version of GDAL 2.2.3 that corresponds to your Python version and either 32 or 64 bit. For example, based on the message above, I would download `GDAL‑2.2.3‑cp36‑cp36m‑win32.whl` (`cp36` refers to my Python version, `win32` to the 32-bit Python).
 
 Next, change directory to the the location to which you downloaded the `.whl` file and run:
 
@@ -69,7 +82,7 @@ Finally, run the Python shell again by typing `python` in the command line. Type
 
 ### Load Packages
 
-The top line here is new - we're importing `gdal` from the `osgeo` library.
+Now we will start working in Atom. The top line here is new - we're importing `gdal` from the `osgeo` library, which is how Python interfaces with GDAL.
 
 ```python
 from osgeo import gdal
@@ -81,9 +94,9 @@ import os
 DATA = "/Users/ehuntley/Desktop/week-05/landsat"
 ```
 
-## Calculating a Normalized Vegetation Index
+## Calculating a Normalized Difference Vegetation Index
 
-The first thing we're going to do is use the near-infrared and red bands of the Landsat imagery to calculate a simple index for estimating *how much vegetation* is present in a given raster cell; this simple index is called the Normalized Vegetation Index (NDVI). We calculate it as follows:
+The first thing we're going to do is use the near-infrared and red bands of the Landsat imagery to calculate a simple index for estimating *how much vegetation* is present in a given raster cell; this simple index is called the Normalized Difference Vegetation Index (NDVI). We calculate it as follows:
 
 ![image](./images/ndvi.svg)
 
@@ -106,7 +119,7 @@ nir_band = nir_data.GetRasterBand(1)
 nir = nir_band.ReadAsArray()
 ```
 
-What we see above is `gdal` proceeding in three steps. It opens a connection to the file, obtains the raster band (all the data we'll be working with only contains band 1) and reading it as a `numpy` array so that we can process it. We can see that these are `numpy` arrays by checking their type.
+What we see above is `gdal` proceeding in three steps. It opens a connection to the file, obtains the raster band (all the data we'll be working with only contains band 1), and reads in a `numpy` array so that we can process it. We can see that these are `numpy` arrays by checking their type.
 
 ```python
 type(nir)
@@ -115,6 +128,7 @@ type(nir)
 These `red` and `nir` arrays are what we will be working with to calculate our NDVI! First, let's examine one of them by plotting it using `matplotlib`'s `imshow` (image show) function:
 
 ```python
+# make sure you run these two lines at the same time or the color bar won't show up in your plot
 plt.imshow(nir)
 plt.colorbar()
 ```
@@ -122,7 +136,7 @@ plt.colorbar()
 This is aerial imagery conveniently cropped to the area surrounding Greater Boston. Next, let's define a function that will calculate our NDVI! Our `nir` and `red` variables are `numpy` arrays, which are vectorized; therefore we can add them, subtract them, etc. as we would the column of a `dataframe`.
 
 ```python
-def ndvi(red, nir):
+def ndvi_calc(red, nir):
     """ Calculate NDVI"""
     return (nir - red) / (nir + red)
 ```
@@ -130,34 +144,34 @@ def ndvi(red, nir):
 Now let's run it!
 
 ```python
-plt.imshow(ndvi(red, nir))
+# here we are calling our function within the plot!
+plt.imshow(ndvi_calc(red, nir), cmap="YlGn")
 plt.colorbar()
 ```
 
-Uh-oh. That doesn't look too promising... the problem is that we're dealing with
+Uh-oh. That doesn't look too promising... the problem is that we're trying to do math that results in non-integer values with data inputs stored as integers. We can verify this as follows:
 
 ```python
-gdal.GetDataTypeName(nir_band.DataType)
+red.dtype
 nir.dtype
 ```
-
+`uint16` refers to an unsigned 16-bit integer. So in addition to the fact that we're doing non-integer math with integer datatypes, we're also potentially creating negative values, which doesn't work so well with an unsigned data type. Good thing we can easily convert these `numpy` arrays using the `numpy` `.astype()` method.
 
 ```python
 red = red.astype(np.float32)
 nir = nir.astype(np.float32)
 
-plt.imshow(ndvi(red, nir), cmap='YlGn')
+plt.imshow(ndvi_calc(red, nir), cmap='YlGn')
 plt.colorbar()
-
 ```
 
+Better! We've just made a map of vegetated land cover using a new raster data layer derived from red and near-infrared Landsat data! Let's store the results of this function as a new variable.
 
 ```python
-ndvi = ndvi(red, nir)
-
-plt.imshow(ndvi, cmap='RdYlGn')
-plt.colorbar()
+ndvi = ndvi_calc(red, nir)
 ```
+
+**Note About Errors:** We're getting some type errors, but that's because it's dividing by null values - the function still works and will serve our purposes just fine. You may continue to get similar errors throughout the exercise. Nothing to worry about!
 
 ## Calculate Land Surface Temperature
 
@@ -165,7 +179,7 @@ Not only can we estimate tree cover, but we can also estimate land surface tempe
 
 ### Read in TIRS Band
 
-We'll be reading in the TIRS
+So far, we've been working with the red and near-infrared bands. To calculate the surface temperature, we'll want to read in one of the thermal bands - these are very similar! For now, let's read in Band 10 and ensure that its stored as a floating point data type.
 
 ```python
 # Path of TIRS Band
@@ -175,9 +189,10 @@ b10_raster = os.path.join(DATA, 'b10.TIF')
 tirs_data = gdal.Open(b10_raster)
 tirs_band = tirs_data.GetRasterBand(1)
 tirs = tirs_band.ReadAsArray()
+tirs = tirs.astype(np.float32)
 ```
 
-We now need to read in some correction values stored in the Landsat metadata. You can do this two ways: by opening the file and manually searching. Feel free to do this, jotting down values as you find them. We're looking for:
+We now need to read in some correction values stored in the Landsat metadata in order to convert the values stored in the band to radiances. You can do this the easy (and tedious) way or the slightly harder (and automatic) way. The easy way is by opening the file and manually searching. Feel free to do this, jotting down values as you find them. We're looking for:
 
 + `RADIANCE_MULT_BAND_10`
 + `RADIANCE_ADD_BAND_10`
@@ -186,34 +201,62 @@ We now need to read in some correction values stored in the Landsat metadata. Yo
 
  But this sounds manual and sort of tedious... plus, we'd like to be able to replicate it over many Landsat datasets that we may download in the future. So let's look at a cooler way! We can read in the metatdata `txt` file and locate our variables of interest programmatically.
 
+ Let's read the text file in as a Python list.
+
 ```python
-meta_file = '/Users/ehuntley/Desktop/week-05/landsat/LC08_L1TP_012031_20170716_20170727_01_T1_MTL.txt'
+# make this path the local path to your MTL.txt file that you downloaded at the start of the workshop
+meta_file = '/Users/ehuntley/Desktop/week-05/landsat/MTL.txt'
 
 with open(meta_file) as f:
     meta = f.readlines()
+```
 
+Check out the format of the `meta` list; each line of the text file is stored as an element in a list. We can then search this list for the variables of interest using list comprehension.
+
+```python
 # Define terms to match
 matchers = ['RADIANCE_MULT_BAND_10', 'RADIANCE_ADD_BAND_10', 'K1_CONSTANT_BAND_10', 'K2_CONSTANT_BAND_10']
 
-# Let's look at what this returns...
-matching = [s for s in meta if any(xs in s for xs in matchers)]
-print(matching)
-
+[s for s in meta if any(xs in s for xs in matchers)]
 ```
-We see that we've returned a list of the format `    RADIANCE_MULT_BAND_10 = 3.3420E-04\n` where `\n` is a line break character. We can use two string methods to first, split the resulting string at the equals sign and return what comes after the equals sign (`.split(' = ')[1]`) and second, to strip the `\n` from the end (`.strip('\n')`). We finally coerce the resulting number to a floating point data type.
+
+We see that we've returned a list containing our variables and their values in the format `    RADIANCE_MULT_BAND_10 = 3.3420E-04\n` where `\n` is a line break character. We can use two string methods to first, split the resulting string at the `=` and return what comes after the equals sign (`.split(' = ')[1]`) and second, to strip the `\n` from the end (`.strip('\n')`). We finally coerce the resulting number to a floating point data type. Let's define a function to do this:
 
 ```python
 def process_string (st):
     return float(st.split(' = ')[1].strip('\n'))
+```
 
+Let's run that list comprehension again, applying our function to the results in a variable, `matching`.
+
+```python
 matching = [process_string(s) for s in meta if any(xs in s for xs in matchers)]
+```
+
+Finally, we can assign each element of the list to a different variable name.
+
+```python
 rad_mult_b10, rad_add_b10, k1_b10, k2_b10 = matching
 ```
-The last line stores elements of the resulting list using more readable variable names.  Cool!
 
+We now calculate a series of different derived values; we're about to play-act the role of geophysicist. Of course, much of this is simply applying other people's methods - we can look to the scientific literature to find methods and apply them to our datasets. We don't necessarily need to understand every single step... in fact, it's common that working with datasets involves applying methods without getting too bogged down in the specifics. We're just looking for an estimate of land surface temperature, not a rigorous, geoscientist-approved model (and, anyway, we can use geoscientist approved models).
 
+Let's get started!
 
-### Step 1: Calculate At-Sensor Spectral Radiance
+### Step 1: Calculate Top of Atmosphere Spectral Radiance
+
+First, we scale the `tirs` band using the multiplicative and additive factors stored in the Landsat metadata - this produces a measured radiance at the top of the atmosphere.
+
+![At-Sensor Spectral Radiance](./images/spec_rad.png)
+
+Where:
+
++ Lλ = TOA spectral radiance (Watts/( m2 * srad * μm))
++ ML = Band-specific multiplicative rescaling factor from the metadata (e.g., `rad_mult_b10)`)
++ AL = Band-specific additive rescaling factor from the metadata (e.g., `rad_add_b10`)
++ Qcal = Quantized and calibrated standard product pixel values (e.g., `tirs`)
+
+We have all of these values;  
 
 ```python
 rad = rad_mult_b10 * tirs + rad_add_b10
@@ -221,27 +264,70 @@ plt.imshow(rad, cmap='RdYlGn')
 plt.colorbar()
 ```
 
-
 ### Step 2: Calculate Brightness Temperature
+
+We then calculate the brightness temperature at the top of the atmosphere. This is not quite temperature as we usually understand it; it is a measure of radiation. We calculate this according to the following equation:
+
+![At-Sensor Spectral Radiance](./images/bt.png)
+
+Where:
+
++ T = Top of atmosphere brightness temperature (K)
++ Lλ = TOA spectral radiance (`rad`)
++ K1 = Band-specific thermal conversion constant from the metadata (`k1_b10`)
++ K2 = Band-specific thermal conversion constant from the metadata (`k2_b10`)
+
+This also calculates the brightness temperature in degrees Kelvin, so convert by subtracting 273.15.
+
 ```python
 bt = k2_b10 / np.log((k1_b10/rad) + 1) - 273.15
 plt.imshow(bt, cmap='RdYlGn')
 plt.colorbar()
 ```
+
 ### Step 3: Calculate Normalized Difference Vegetation Index
 
-We've already done this!
+We've already done this! It should be stored in the variable `ndvi`.
+
+```python
+plt.imshow(ndvi, cmap='YlGn')
+plt.colorbar()
+```
 
 ### Step 4: Calculate Proportional Vegetation
 
+We now need to produce an estimate of the proportional vegetation. We can calculate this like so:
+
+![Proportional Vegetation](./images/pv.png)
+
+Where:
++ NDVI = Normalized Difference Vegetation Index (`ndvi`)
++ NDVI_s = approximation of the NDVI value for unvegetated terrain (0.2)
++ NDVI_v = approximation of the NDVI value for vegetated terrain
+
+We're going to make a bunch of assumptions here - that NDVI < 0.2 implies unvegetated terrain, that 0.2 < NDVI < 0.5 implies a mixture of vegetation and unvegetated terrain, and that NDVI > 0.5 implies nearly fully vegetated land. This is a simplifying assumption that probably wouldn't hold up to rigorous testing, but it's fine for our purposes.
+
 ```python
 pv = (ndvi - 0.2) / (0.5 - 0.2) ** 2
-pv.dtype
 plt.imshow(pv, cmap='RdYlGn')
 plt.colorbar()
 ```
 
 ### Step 5: Calculate Land Surface Emissivity
+
+We're then going to reclassify our `pv` to make it correspond to differently levels of surface emissivity - in other words, how effectively does it emit thermal radiation (heat)? We define a number of ranges: if NDVI is negative, we assume it's water, with a emissivity of 0.991. If it's between 0 and 0.2, we assume we're dealing with something with the emissivity of soil (0.991). If it's between 0.2 and 0.5, we calculate a value based on the proportion of vegetation in the cell. If it's greater than 5, we assume we're dealing with heavy vegetation and set the emissivity to an estimate of vegetation emissivity (0.973).
+
+![Emissivity](./images/emis.png)
+
+Where:
+
++ ԑλ = Land Surface Emissivity
++ P_v = Proportional Vegetation (`pv`)
++ ԑs = Estimate of soil emissivity (0.966)
++ ԑv = Estimate of vegetation emissivity (0.973)
++ C = surface roughness (we're using a value of 0.005)
++ NDVI_s = approximation of the NDVI value for unvegetated terrain (0.2)
++ NDVI_v = approximation of the NDVI value for vegetated terrain (0.5)
 
 ```python
 def emissivity_reclass (pv, ndvi):
@@ -252,13 +338,28 @@ def emissivity_reclass (pv, ndvi):
     ndvi_dest[np.where(ndvi >= 0.5)] = 0.973
     return ndvi_dest
 
-emissivity = emissivity_reclass(pv, ndvi)
+emis = emissivity_reclass(pv, ndvi)
 
-plt.imshow(emissivity, cmap='RdYlGn')
+plt.imshow(emis, cmap='RdYlGn')
 plt.colorbar()
 ```
 
 ### Step 6: Calculate Land Surface Temperature
+
+Finally, we calculate the Land Surface Temperature using several physical constants, our estimate of the brightness temperature at the sensor, and our estimate of land emissivity. This looks like this:
+
+![Land Surface Temperature](./images/lst.png)
+
+Ts = Land Surface Temperature
+BT = Brightness Temperature (`bt`)
+e = Emissivity (`emis`)
+ρ = h * (c / σ)
+σ = Boltzmann constant (1.38e-23)
+c = Speed of light (2.998e8)
+h = Planck's Constant (6.626e-34)
+
+Let's first define our physical constants:
+
 ```python
 wave = 10.8E-06
 # PLANCK'S CONSTANT
@@ -268,7 +369,12 @@ c = 2.998e8
 # BOLTZMANN's CONSTANT
 s = 1.38e-23
 p = h * c / s
-lst = bt / (1 + (wave * bt / p) * np.log(emissivity))
+```
+
+Let's then calculate the LST.
+
+```python
+lst = bt / (1 + (wave * bt / p) * np.log(emis))
 
 plt.imshow(lst, cmap='RdYlGn')
 plt.colorbar()
@@ -276,20 +382,30 @@ plt.colorbar()
 
 # Write a .tif File
 
-Creating a new TIF file using GDAL is a bit cumbersome, but it looks a little bit like this. We're going to write our land surface temperature
+Creating a new TIF file using GDAL is a bit cumbersome, but it looks a little bit like this. We're going to write our land surface temperature to a Geotiff, just like the ones we imported.
 
 ```python
+# Invoke the GDAL Geotiff driver
 driver = gdal.GetDriverByName('GTiff')
 
-new_dataset = driver.Create('ndvi.tif',
-                    red_data.RasterXSize,
-                    red_data.RasterYSize,
+# Use the driver to create a new file.
+# It has the same dimensions as our original rasters
+# so we can use the tirs_data size properties
+# Note that tirs_data = gdal.Open(b10_raster)
+# This is not the numpy array!
+new_dataset = driver.Create('/Users/ehuntley/Desktop/week-05/landsat/lst.tif',
+                    tirs_data.RasterXSize,
+                    tirs_data.RasterYSize,
                     1,
                     gdal.GDT_Float32)
-new_dataset.SetProjection(red_data.GetProjection())
-new_dataset.SetGeoTransform(red_data.GetGeoTransform())
+# Set projection - same logic as above.
+new_dataset.SetProjection(tirs_data.GetProjection())
+# Set transformation - same logic as above.
+new_dataset.SetGeoTransform(tirs_data.GetGeoTransform())
+# Set up a new band.
 new_band = new_dataset.GetRasterBand(1)
+# Set NoData Value
 new_band.SetNoDataValue(-1)
-
+# Write our Numpy array to the new band!
 new_band.WriteArray(lst)
 ```
