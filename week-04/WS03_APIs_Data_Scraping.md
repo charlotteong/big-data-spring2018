@@ -370,15 +370,7 @@ tweets['location'].replace(bos_list, 'Boston, MA', inplace = True)
 ## this replaces all the things with Boston, MA
 tweets['location'].unique()
 ## data has been replaced with more consistent conventions
-=======
-print(bos_list)
 
-
-tweets['location'].replace(bos_list, 'Boston, MA', inplace = True)
-
-tweets['location'].unique()
->>>>>>> class/master
-```
 
 To finish cleaning the data, you would want to iteratively follow a similar process until you've cleaned all locations and made them conform to a single convention.
 

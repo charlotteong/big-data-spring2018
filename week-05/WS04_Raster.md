@@ -46,20 +46,15 @@ We'll be doing our coding in Python by reading in a library called `osgeo`. Howe
 
 Mac users will install GDAL from [http://www.kyngchaos.com/software:frameworks](http://www.kyngchaos.com/software:frameworks). Select the most recent version (2.2 at the time of this writing). Install it using the default options. It will probably behoove you to restart your system after you've installed.
 
-<<<<<<< HEAD
-import sys
-sys.path.insert(0,'/Library/Frameworks/GDAL.framework/Versions/2.2/Python/3.6/site-packages')
-from osgeo import gdal
-=======
 Once you've installed GDAL from KyngChaos, you'll have to add its location to your Python path. You'll only have to do this once. If you're using your virtual environment (again, we still recommend this), activate it first (`. ~/.venvs/bdvs/bin/activate`). Then open the Python terminal by typing `python`. Then, type the following lines:
 
 ```python
 import sys
 sys.path.insert(0,'/Library/Frameworks/GDAL.framework/Versions/2.2/Python/3.6/site-packages')
+from osgeo import gdal
 ```
-
 You (should) only need to do this once.
->>>>>>> class/master
+
 
 ### Windows
 
@@ -91,7 +86,7 @@ import numpy as np
 import os
 %matplotlib inline
 ## make sure you set the DATA path to be to the folder where you downloaded the data at the beginning of class
-DATA = "/Users/ehuntley/Desktop/week-05/landsat"
+DATA = "/Users/charlotteong/Dropbox (MIT)/Spring 2018/Big Data/ws04_materials"
 ```
 
 ## Calculating a Normalized Difference Vegetation Index
@@ -112,8 +107,9 @@ b5_raster = os.path.join(DATA, 'b5.tif')
 red_data = gdal.Open(b4_raster)
 red_band = red_data.GetRasterBand(1)
 red = red_band.ReadAsArray()
+## take the full grid of raster values and read as a numpy array -- able to calculate means, sums etc.
 
-# Load in Near-infrasred band
+# Load in Near-infrared band
 nir_data = gdal.Open(b5_raster)
 nir_band = nir_data.GetRasterBand(1)
 nir = nir_band.ReadAsArray()
@@ -130,10 +126,13 @@ These `red` and `nir` arrays are what we will be working with to calculate our N
 ```python
 # make sure you run these two lines at the same time or the color bar won't show up in your plot
 plt.imshow(nir)
+## stands for image show. collection of pixels
 plt.colorbar()
 ```
 
 This is aerial imagery conveniently cropped to the area surrounding Greater Boston. Next, let's define a function that will calculate our NDVI! Our `nir` and `red` variables are `numpy` arrays, which are vectorized; therefore we can add them, subtract them, etc. as we would the column of a `dataframe`.
+
+calculates the difference and divides by the sum of the two features
 
 ```python
 def ndvi_calc(red, nir):
@@ -155,7 +154,7 @@ Uh-oh. That doesn't look too promising... the problem is that we're trying to do
 red.dtype
 nir.dtype
 ```
-`uint16` refers to an unsigned 16-bit integer. So in addition to the fact that we're doing non-integer math with integer datatypes, we're also potentially creating negative values, which doesn't work so well with an unsigned data type. Good thing we can easily convert these `numpy` arrays using the `numpy` `.astype()` method.
+`uint16` refers to an unsigned 16-bit integer. (Cannot store negative values). So in addition to the fact that we're doing non-integer math with integer datatypes, we're also potentially creating negative values, which doesn't work so well with an unsigned data type. Good thing we can easily convert these `numpy` arrays using the `numpy` `.astype()` method.
 
 ```python
 red = red.astype(np.float32)
@@ -205,7 +204,7 @@ We now need to read in some correction values stored in the Landsat metadata in 
 
 ```python
 # make this path the local path to your MTL.txt file that you downloaded at the start of the workshop
-meta_file = '/Users/ehuntley/Desktop/week-05/landsat/MTL.txt'
+meta_file = "/Users/charlotteong/Dropbox (MIT)/Spring 2018/Big Data/ws04_materials/MTL.txt"
 
 with open(meta_file) as f:
     meta = f.readlines()
@@ -393,7 +392,7 @@ driver = gdal.GetDriverByName('GTiff')
 # so we can use the tirs_data size properties
 # Note that tirs_data = gdal.Open(b10_raster)
 # This is not the numpy array!
-new_dataset = driver.Create('/Users/ehuntley/Desktop/week-05/landsat/lst.tif',
+new_dataset = driver.Create('/Users/charlotteong/Dropbox (MIT)/Spring 2018/Big Data/ws04_materials/lst.tif',
                     tirs_data.RasterXSize,
                     tirs_data.RasterYSize,
                     1,

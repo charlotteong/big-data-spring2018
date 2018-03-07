@@ -82,8 +82,8 @@ def get_tweets(
       print("Error : " + str(e))
       break
   print (f"Downloaded {tweet_count} tweets.")
-  # if write == True:
-  #     all_tweets.to_json(out_file)
+  if write == True:
+       all_tweets.to_json(out_file)
   return all_tweets
 
 # Set a Lat Lon
@@ -96,7 +96,7 @@ geocode_query = latlng + ',' + radius
 file_name = 'data/tweets.json'
 # set threshold number of Tweets. Note that it's possible
 # to get more than one
-t_max = 5000
+t_max = 2000
 
 get_tweets(
   geo = geocode_query,
@@ -158,58 +158,40 @@ tweets['location'].replace(bos_list, 'Boston, MA', inplace = True)
 tweets['location'].unique()
 ## data has been replaced with more consistent conventions
 
-camb_list = tweets[tweets['location'].str.contains("cambridge")]['location']
-tweets['location'].replace(camb_list, 'Cambridge, MA', inplace = True)
-
-somewhere_list = tweets[tweets['location'].str.contains("somewhere")]['location']
-tweets['location'].replace(somewhere_list, 'Somewhere', inplace = True)
-
-somewhere1_list = tweets[tweets['location'].str.contains("Somewhere")]['location']
-tweets['location'].replace(somewhere1_list, 'Somewhere', inplace = True)
-
-somerville_list = tweets[tweets['location'].str.contains("somerville")]['location']
-tweets['location'].replace(somerville_list, 'Somerville, MA', inplace = True)
-
-somerville2_list = tweets[tweets['location'].str.contains("Somerville")]['location']
-tweets['location'].replace(somerville2_list, 'Somerville, MA', inplace = True)
-
-bos2_list = tweets[tweets['location'].str.contains("boston")]['location']
-tweets['location'].replace(bos2_list, 'Boston, MA', inplace = True)
-
-bos3_list = tweets[tweets['location'].str.contains("BOSTON")]['location']
-tweets['location'].replace(bos3_list, 'Boston, MA', inplace = True)
+suff_list = tweets[tweets['location'].str.contains("SUFFOLK")]['location']
+tweets['location'].replace(suff_list, 'Suffolk County, MA', inplace = True)
 
 florida_list = tweets[tweets['location'].str.contains("Florida")]['location']
-tweets['location'].replace(florida_list, 'Florida, USA', inplace = True)
+tweets['location'].replace(florida_list, 'Florida, US', inplace = True)
 
-cali_list = tweets[tweets['location'].str.contains("California")]['location']
-tweets['location'].replace(cali_list, 'California, USA', inplace = True)
+us_list = tweets[tweets['location'].str.contains("USA")]['location']
+tweets['location'].replace(us_list, 'US', inplace = True)
 
-there_list = tweets[tweets['location'].str.contains("There")]['location']
-tweets['location'].replace(there_list, 'There', inplace = True)
+mich_list = tweets[tweets['location'].str.contains("M I C H I G A N")]['location']
+tweets['location'].replace(mich_list, 'Michigan, US', inplace = True)
 
-there2_list = tweets[tweets['location'].str.contains("there")]['location']
-tweets['location'].replace(there2_list, 'There', inplace = True)
+moreUS_list = tweets[tweets['location'].str.contains("Estados")]['location']
+tweets['location'].replace(moreUS_list, 'US', inplace = True)
 
-LA_list = tweets[tweets['location'].str.contains("Los Angeles")]['location']
-tweets['location'].replace(LA_list, 'Los Angeles, CA', inplace = True)
+United_list = tweets[tweets['location'].str.contains("United")]['location']
+tweets['location'].replace(United_list, 'US', inplace = True)
 
-lagos_list = tweets[tweets['location'].str.contains("Lagos")]['location']
-tweets['location'].replace(lagos_list, 'Lagos, Nigeria', inplace = True)
+bos2_list = tweets[tweets['location'].str.contains("BOS")]['location']
+tweets['location'].replace(bos2_list, 'Boston, MA', inplace = True)
 
-india_list = tweets[tweets['location'].str.contains("India")]['location']
-tweets['location'].replace(india_list, 'India', inplace = True)
+unknown_list = tweets[tweets['location'].str.contains('M̴̳̝̺̅̽̔Á̵̟̦̗̈̋Ș̶̝͇̓̐͝S̵̡̎͊͝')]['location']
+tweets['location'].replace(unknown_list, 'Unknown', inplace = True)
 
-chicago_list = tweets[tweets['location'].str.contains("Chicago")]['location']
-tweets['location'].replace(chicago_list, 'Chicago, IL', inplace = True)
+unknown2_list = tweets[tweets['location'].str.contains('gurls')]['location']
+tweets['location'].replace(unknown2_list, 'Unknown', inplace = True)
 
-newyork_list = tweets[tweets['location'].str.contains("NYC")]['location']
-tweets['location'].replace(newyork_list, 'New York, NY', inplace = True)
+unknown3_list = tweets[tweets['location'].str.contains('other')]['location']
+tweets['location'].replace(unknown3_list, 'Unknown', inplace = True)
 
-newyork1_list = tweets[tweets['location'].str.contains("New York")]['location']
-tweets['location'].replace(newyork1_list, 'New York, NY', inplace = True)
+unknown4_list = tweets[tweets['location'].str.contains('in my')]['location']
+tweets['location'].replace(unknown4_list, 'Unknown', inplace = True)
 
-tweets['location'].unique()
+print(tweets['location'].unique())
 
 
 tweets[tweets.duplicated(subset = 'content', keep = False)]
@@ -225,7 +207,7 @@ colors = ["#697dc6","#5faf4c","#7969de","#b5b246",
           "#737632","#9f4b75","#c36960"]
 
 # Create a pie chart
-plt.pie(df_count_tweets['count'], labels=df_count_tweets.index.get_values(), radius = 10, shadow=False, colors=colors, labeldistance = 1.2, rotatelabels = True)
+plt.pie(df_count_tweets['count'], labels=df_count_tweets.index.get_values(), shadow=False, colors=colors, rotatelabels = True)
 plt.axis('equal')
 plt.tight_layout()
 plt.show()
@@ -302,8 +284,8 @@ def get_tweets_search(
       print("Error : " + str(e))
       break
   print (f"Downloaded {tweet_count} tweets.")
-  # if write == True:
-  #     all_tweets.to_json(out_file)
+  if write == True:
+     all_tweets.to_json(out_file)
   return all_tweets
 
 # Set a Lat Lon
@@ -316,7 +298,7 @@ geocode_query = latlng + ',' + radius
 file_name = 'data/tweets.json'
 # set threshold number of Tweets. Note that it's possible
 # to get more than one
-t_max = 5000
+t_max = 2000
 
 get_tweets(
   geo = geocode_query,
@@ -343,7 +325,7 @@ def parse_tweet(tweet):
   p['time'] = str(tweet.created_at)
   return p
 
-tweets = get_tweets_search(
+tweets_climate = get_tweets_search(
   geo = geocode_query,
   tweet_max = t_max,
   write = True,
@@ -353,22 +335,75 @@ import numpy as np
 import matplotlib.pyplot as plt
 %matplotlib inline
 
-tweets.dtypes
-tweets['location'].unique()
-loc_tweets = tweets[tweets['location'] != '']
+tweets_climate.dtypes
+tweets_climate['location'].unique()
+loc_tweets_climate = tweets_climate[tweets_climate['location'] != '']
 ## limits to tweets that have location specified
-count_tweets = loc_tweets.groupby('location')['id'].count()
+count_tweets_climate = loc_tweets.groupby('location')['id'].count()
 ## counts tweets grouping by location
-df_count_tweets = count_tweets.to_frame()
-df_count_tweets
-df_count_tweets.columns
-df_count_tweets.columns = ['count']
+df_count_tweets_climate = count_tweets.to_frame()
+df_count_tweets_climate
+df_count_tweets_climate.columns
+df_count_tweets_climate.columns = ['count']
 ## sets name of the column
-df_count_tweets
+df_count_tweets_climate
 
-df_count_tweets.sort_index()
+df_count_tweets_climate.sort_index()
 
-sbos_list = tweets[tweets['location'].str.contains("Boston")]['location']
-tweets['location'].replace(sbos_list, 'Boston, MA', inplace = True)
-sbright_list = tweets[tweets['location'].str.contains("Brighton")]['location']
-tweets['location'].replace(sbright_list, 'Brighton, MA', inplace = True)
+sbright_list = tweets_climate[tweets_climate['location'].str.contains("Brighton")]['location']
+tweets_climate['location'].replace(sbright_list, 'Brighton, MA', inplace = True)
+
+sbos_list = tweets_climate[tweets_climate['location'].str.contains("Boston")]['location']
+tweets_climate['location'].replace(sbos_list, 'Boston, MA', inplace = True)
+
+scamb_list = tweets_climate[tweets_climate['location'].str.contains("Cambridge")]['location']
+tweets_climate['location'].replace(scamb_list, 'Cambridge, MA', inplace = True)
+
+susa_list = tweets_climate[tweets_climate['location'].str.contains("U.S.A")]['location']
+tweets_climate['location'].replace(susa_list, 'United States', inplace = True)
+
+ssomer_list = tweets_climate[tweets_climate['location'].str.contains("Somerville")]['location']
+tweets_climate['location'].replace(ssomer_list, 'Somerville, MA', inplace = True)
+
+sdc_list = tweets_climate[tweets_climate['location'].str.contains("DC")]['location']
+tweets_climate['location'].replace(sdc_list, 'Washington DC', inplace = True)
+
+smiami_list = tweets_climate[tweets_climate['location'].str.contains("Miami")]['location']
+tweets_climate['location'].replace(smiami_list, 'Miami, FL', inplace = True)
+
+sflorida_list = tweets_climate[tweets_climate['location'].str.contains("Florida")]['location']
+tweets_climate['location'].replace(sflorida_list, 'Florida, US', inplace = True)
+
+sny_list = tweets_climate[tweets_climate['location'].str.contains("New York")]['location']
+tweets_climate['location'].replace(sny_list, 'New York, NY', inplace = True)
+
+scali_list = tweets_climate[tweets_climate['location'].str.contains("California")]['location']
+tweets_climate['location'].replace(scali_list, 'California, US', inplace = True)
+
+snorth_list = tweets_climate[tweets_climate['location'].str.contains("north")]['location']
+tweets_climate['location'].replace(snorth_list, 'United States', inplace = True)
+
+scape_list = tweets_climate[tweets_climate['location'].str.contains("Cape")]['location']
+tweets_climate['location'].replace(scape_list, 'Cape Cod, RI', inplace = True)
+
+snh_list = tweets_climate[tweets_climate['location'].str.contains("NH")]['location']
+tweets_climate['location'].replace(snh_list, 'New Hampshire, US', inplace = True)
+
+snj_list = tweets_climate[tweets_climate['location'].str.contains("New Jersey")]['location']
+tweets_climate['location'].replace(snj_list, 'New Jersey, US', inplace = True)
+
+print(tweets_climate['location'].unique())
+
+tweets_climate[tweets_climate.duplicated(subset = 'content', keep = False)]
+tweets_climate.drop_duplicates(subset = 'content', keep = False, inplace = True)
+
+tweets_climate.to_csv('twitter_climatesearch.csv', sep=',', encoding='utf-8')
+
+tweets_climate_geo = tweets_climate[tweets_climate['lon'].notnull() & tweets['lat'].notnull()]
+len(tweets_climate_geo)
+len(tweets_climate)
+# Use a scatter plot to make a quick visualization of the data points
+plt.scatter(tweets_climate_geo['lon'], tweets_climate_geo['lat'], s = 25)
+plt.show()
+
+## END. 
