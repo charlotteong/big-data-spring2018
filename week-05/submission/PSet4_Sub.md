@@ -26,7 +26,7 @@ Your challenge this week is to package the functionality we were working with in
 ## deleted info on earthexplorer
 
 """
-Write a Python Script Using Functions to Process the Data
+## Write a Python Script Using Functions to Process the Data
 
 In class, we wrote one function to calculate the Normalized Difference Vegetation Index and one function to estimate surface emissivity.
 
