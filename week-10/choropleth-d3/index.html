@@ -23,6 +23,50 @@
 <script src="https://d3js.org/topojson.v2.min.js"></script>
 <script>
 
+// + ensures that it is a numerical value
+  var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+// creates an unemployment object that we can map to another dataset
+  var unemployment = d3.map();
+
+//geopath allows you to render paths based on geoprojection systems
+  var path = d3.geoPath();
+  console.log(d3.range(2,10));
+  console.log(d3.schemeBlues[9]);
+// sets up a scale that bins input value based on input thresholds
+  var color = d3.scaleThreshold()
+    .domain(d3.range(2, 10))
+    //this allows us to specify a color scheme with a given number of buckets
+    // when a number exceeds the top of the domain, it will be in a greater than bucket 
+    .range(d3.schemeBlues[9]);
+
+// opens two files - topojson file. this sets up a line of files that triggers at the conclusion of their loading a function.
+// this prevents a situation where we run code that requires data that we haven't loaded yet
+  d3.queue()
+    .defer(d3.json, "https://d3js.org/us-10m.v1.json")
+    .defer(d3.tsv, "unemployment.tsv", function(d) {unemployment.set(d.id, +d.rate);})
+    .await(ready);
+
+  function ready(error, us) {
+    if (error) throw error;
+
+// classes allow you to exert the same characteristics over all elements in the bucket
+    svg.append("g")
+      .attr("class", "counties")
+      .selectAll("path")
+      // this picks up within topojson file, the objects list and the county sublist and then return counties as features
+      //translates between topojson and json file
+      .data(topojson.feature(us, us.objects.counties).features)
+      .enter().append("path")
+        .attr("fill", function(d) {
+          return color(d.rate = unemployment.get(d.id));
+        })
+        .attr("d", path);
+  }
+
+
 </script>
 </body>
 </html>
