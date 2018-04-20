@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!-- opening html tag identifies the contained text as html and tells the browser and search engines that the page is in English -->
+<html lang="en">
+<!-- head element, bounded by <head> tags, contains metadata and links to external files -->
+<head>
+	<!-- metadata identifying how characters are encoded. There are many ways to encode text, but UTF-8 standard in web development. -->
+	<meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js" charset = "utf-8"></script>
+	<!-- Creates a title that is displayed in the browser's title bar, search engine results, etc. but not in the page body -->
+	<title>NORMALISED BAR CHART</title>
+</head>
+
+<body>
+
+<style>
+ .bar {
+   fill: steelblue;
+   }
+ .axis path {
+   display: none;
+   }
+ </style>
+
+ <svg width="960" height="600"></svg>
+ <script>
+ var neigh_311 = [];
+
+ var chart2 = d3.select("svg"),
+   margin = {top: 20, right: 120, bottom: 150, left: 40},
+   width = +chart2.attr("width") - margin.left - margin.right,
+   height = +chart2.attr("height") - margin.top - margin.bottom,
+   g = chart2.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+ var x = d3.scaleBand()
+     .rangeRound([0, width])
+     .padding(0.1)
+     .align(0.1);
+
+ var y = d3.scaleLinear()
+     .rangeRound([height, 50]);
+
+ var z = d3.scaleOrdinal()
+     .range(["#16425b", "#2f6690", "#3a7ca5", "#81c3d7", "#d0f2d9", "#e6e8cc"]);
+
+ var stack = d3.stack()
+     .offset(d3.stackOffsetExpand);
+
+ d3.csv("neigh_311.csv", type, function(error, neigh_311) {
+   if (error) throw error;
+
+ neigh_311.sort(function(a, b) { return b[neigh_311.columns[1]] / b.total - a[neigh_311.columns[1]] / a.total; });
+
+ x.domain(neigh_311.map(function(d) { return d.Name; }));
+ z.domain(neigh_311.columns.slice(1));
+
+ var serie = g.selectAll(".serie")
+   .data(stack.keys(neigh_311.columns.slice(1))(neigh_311))
+   .enter().append("g")
+     .attr("class", "serie")
+     .attr("fill", function(d) { return z(d.key); });
+
+ serie.selectAll("rect")
+   .data(function(d) { return d; })
+   .enter().append("rect")
+     .attr("x", function(d) { return x(d.data.Name); })
+     .attr("y", function(d) { return y(d[1]); })
+     .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+     .attr("width", x.bandwidth());
+
+ g.append("g")
+     .attr("class", "axis axis--x")
+     .attr("transform", "translate(0," + height + ")")
+     .call(d3.axisBottom(x))
+     .selectAll("text")
+       .style("text-anchor", "end")
+       .attr("dx", "-.8em")
+       .attr("dy", ".15em")
+       .attr("transform", "rotate(-65)");;
+
+   g.append("g")
+       .attr("class", "axis axis--y")
+       .call(d3.axisLeft(y).ticks(10, "%"));
+
+   g.append("text")
+   			.attr("x", (width / 2))
+   		  .attr("y", 20)
+   		  .attr("text-anchor", "middle")
+   		  .style("font-size", "16px")
+   		  .style("font-weight", "bold")
+   		  .text("311 Requests Across Boston Neighbourhoods By Type");
+
+   var legend = serie.append("g")
+       .attr("class", "legend")
+       .attr("transform", function(d) { var d = d[d.length - 1]; console.log(d); return "translate(" + (x(d.data.Name) + x.bandwidth()) + "," + ((y(d[0]) + y(d[1])) / 2) + ")"; });
+
+   legend.append("line")
+       .attr("x1", -6)
+       .attr("x2", 6)
+       .attr("stroke", "#000");
+
+   legend.append("text")
+       .attr("x", 9)
+       .attr("dy", "0.35em")
+       .attr("fill", "#000")
+       .style("font", "10px sans-serif")
+       .text(function(d) { return d.key; });
+     });
+
+   function type(d, i, columns) {
+     for (i = 1, t = 0; i < columns.length; ++i) {t += d[columns[i]] = +d[columns[i]];}
+     d.total = t;
+     return d;
+   }
+
+   </script>
+
+   <p> Source Info: Data taken from Analyse Boston. This chart displays 311 calls in each Boston neighborhood broken down by the source of the call.
+   Code for visualization adapted from <a href= "https://bl.ocks.org/mbostock/3886394">Mike Bostock Normalised Stacked Bar Chart</a>.
+   </p>
+
+ </body>
+ </html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Learning D3</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
+  <!-- script: this is like import command in python. need to pay attention to which version you are bringing in.
+        load in older versions as necessary. don't load in multiple versions. create multiple viz,
+        each viz will have its own page/js file/html file. cannot run multiple versions of d3 on the same file -->
+</head>
+
+<!-- 40, 90, 30, 60 -->
+<body>
+  <!--
+  <svg width="160" height="160">
+    <rect x="30" width="20" height="40" fill="steelblue"></rect>
+
+    <rect x="55" width="20" height="90" fill="steelblue"></rect>
+    <rect x="80" width="20" height="30" fill="steelblue"></rect>
+    <rect x="105" width="20" height="60" fill="steelblue"></rect>
+  </svg>
+-->
+
+  <!-- script - will run as javascript
+        javascript functions look like: function name (param1 , param2) {};
+      indentation in javascript: meaningless - just do it for readability
+      js is ; delimited - add one to the end of every statement -->
+  <script>
+    //var ratData = [40, 90, 30, 60, 20, 40, 100];
+
+    // to read in a csv
+    var neigh_311 = [];
+
+    // neigh : set to the value of the neighborhood column, num_311 set to the key num_311 in dataset
+    // function(error, rows) lets you know if there are any functions
+    d3.csv("data/neigh_311.csv", function(d) {
+      return {
+        neigh : d.neighborhood,
+        num_311 : +d.num_311
+      };
+    }, function(error, rows) {
+      neigh_311 = rows;
+      console.log(neigh_311);
+      createVisualization();
+    })
+    // writing the createVisualization into this ensures that the visualization is loaded first
+
+    //console.log(d3.selectAll("rect"))
+
+  function createVisualization() {
+
+    var w = 300;
+    var h = 350;
+
+    // to dynamically generate the size of the graphic:
+    var arrayLength = neigh_311.length;
+    // if we were reading in the ratData, replace all neigh_311 with ratData
+    var maxValue = d3.max(neigh_311, function(d) {return +d.num_311 });
+    // +d to be sure it is numeric value
+    var x_axisLength = 200;
+    var y_axisLength = 200;
+
+    // domain = set of possible values.
+    // will be scaled commensurate to the size of the graphic
+    // use square brackets cos expecting a list for domain and range
+    var yScale = d3.scaleLinear()
+      .domain([0, maxValue])
+      .range([0, y_axisLength]);
+
+    var svg = d3.select("body")
+    //this only selects one object, in this case the body text.
+    // to the end of this object append svg and set width and height elements
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h);
+
+      //CREATE A NEW TOOLTIP! with style properties wow!
+      var tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("font-family", "Open Sans", "sans-serif")
+        .style("font-size", "12px")
+        .style("z-index", "10")
+        .style("visibility", "hidden");
+
+    //select all rectangles in our page -- select in d3 searches the page for elements, returns a selection of objects.
+    //if there aren't any rectangles, create new ones using the ENTER method
+    svg.selectAll("rect")
+      // bind dataset to rectangles
+      .data(neigh_311)
+      // enter() gives instructions to create additional elements, including attributes assigned before
+      .enter()
+      .append("rect")
+
+      // i corresponds to index position. space elements dynamically.
+      // for fixed widths:
+      // // for each rectangle, set it = position in index*25 + 30 for x-axis position measured from the left
+      // .attr("x", function(d,i) {
+      //   return i*25 + 30;
+      // })
+
+      // to take available space and divide it equally to fit in however many bars there are:
+      .attr("x", function(d,i) {
+        return i * (x_axisLength / arrayLength) + 30;
+      })
+
+      // to make the bar charts line up on the bottom since positions are taken from the top-left corner
+      // if not doing it dynamically, h-d means height of graphic - data which is the starting point of the rectangle as measured from top-left
+      // .attr("y", function(d) {
+      //   return h - d;
+      // })
+      // .attr("width", 20)
+      // .attr("height", 100)
+      // .attr("fill", "steelblue");
+
+      // scaling dynamically to fit into fixed graphic size:
+      .attr("y", function(d) {
+        return h - yScale(d.num_311);
+      })
+      .attr("width", (x_axisLength/arrayLength) - 2)
+      .attr("height", function(d) {
+        return yScale(d.num_311);
+      })
+      .attr("fill", "steelblue")
+      .on("mouseover", function(d){
+          return tooltip.style("visibility", "visible").text(d.neigh + ": " + d.num_311);
+      })
+      .on("mousemove", function(d){
+          return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px").text(d.neigh + ": " + d.num_311);
+      })
+      .on("mouseout", function(d){
+          return tooltip.style("visibility", "hidden");
+      });
+
+      svg.append("line")
+        .attr("x1",30)
+        .attr("y1",75)
+        .attr("x2",30)
+        .attr("y2",350)
+        .attr("stroke-width",2)
+        .attr("stroke","black");
+
+      svg.append("line")
+          .attr("x1",30)
+          .attr("y1",350)
+          .attr("x2",300)
+          .attr("y2",350)
+          .attr("stroke-width",2)
+          .attr("stroke","black");
+
+      svg.append("text")
+        .attr("class","y label")
+        .attr("text-anchor", "end")
+        .text("No. of 311 Calls")
+        .attr("transform", "translate(20,20), rotate(-90)")
+      //this rotates the text, moves the text x and y direction by 20 px
+
+      // set height based on value of array at iterator position
+      //function d is an anonymous function
+      //d3 uses method-chaining --> .method .method etc.
+      //.attr("height", function (d) {
+      //   console.log(d);
+      //   return d;
+      // });
+
+    }
+
+  </script>
+
+</body>
+</html>

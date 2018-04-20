@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+  <title>Mapping!</title>
+  <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+  <meta charset="utf-8">
+  <script src="data/boston_neighborhoods.json"></script>
+  <script src="data/boston_rodents.json"></script>
+  <!-- it's like running the block of js as a script. geo json is stored in js. no translation needed. -->
+  <style>
+    .incident {
+      fill: steelBlue;
+    }
+  </style>
+</head>
+
+<body>
+  <!--http://duspviz.mit.edu/d3-workshop/mapping-data-with-d3/  -->
+
+  <script>
+  // create global elements
+  var width = 700;
+  var height = 580;
+
+  //svg element to contain visuals
+  var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  //svg has things called 'g' elements
+  var neigh = svg.append("g");
+  var rodents = svg.append("g");
+
+  var albersProjection = d3.geoAlbers()
+    .scale(190000)
+    // scale doesn't mean cartographic scale.
+    .rotate([71.057, 0])
+    // lat and long are split over two categories. rotate = longitude (rotation around the world)
+    // center = lat
+    // sets a center at 42.313 deg of latitude (where boston is)
+    .center([0, 42.313])
+    .translate( [width/2, height/2] );
+    //coordinates in d3 are drawn from upper left corner. for map to be visible, need to move it to be centered to the middle point.
+
+  var geoPath = d3.geoPath()
+    .projection(albersProjection);
+
+  // now start to draw things, selecting paths:
+  neigh.selectAll("path")
+    .data(neighborhoods_json.features)
+    //reads in the features of the dataset
+    .enter()
+    .append("path")
+    .attr("fill", "#ccc")
+    .attr("stroke", "#333")
+    .attr("d", geoPath);
+    //defines coordinates according to geoPath object using albers coordinate system
+
+  //use same syntax whether polygon or points
+  rodents.selectAll("path")
+    .data(rodents_json.features)
+    .enter()
+    .append("path")
+    .attr("fill", "#900")
+    .attr("stroke", "#999")
+    .attr("d", geoPath)
+    .attr("class", "incident");
+    //class allows you to style in css
+
+  </script>
+
+</body>
+</html>
