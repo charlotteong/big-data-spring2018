@@ -32,6 +32,9 @@ import matplotlib.pylab as plt
 
 df = pd.read_csv('week-03/data/skyhook_2017-07.csv', sep=',')
 
+# On PH computer
+df = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/skyhook_2017-07.csv', sep=',')
+
 # Create a new date column formatted as datetimes.
 df['date_new'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
 
@@ -69,6 +72,9 @@ Your first task is to create a bar chart (not a line chart!) of the total count 
 groupby_date = df.groupby('date')['count']
 groupby_date_agg = groupby_date.sum()
 groupby_date_agg.plot.bar(color='b', title='Total GPS Pings by Date')
+## Good job. For future reference, you can do this in fewer lines:
+by_day = df.groupby('date_new')['count'].sum()
+by_day.plot(kind = "bar")
 ```
 
 ## Problem 2: Modify the Hours Column
@@ -141,6 +147,9 @@ Time2.plot.scatter(x='lon', y='lat', s=Time2['count']/5)
 Time3 = df[df['time_stamp'] == pd.Timestamp('2017-07-31 19:00:00')]
 Time3.plot.scatter(x='lon', y='lat', s=Time3['count']/5)
 
+## After running through your code, your last timestamp is at 16:00 on July 31st, so this last chart is unable to plot. However, the setup is correct so you will get partial credit.
+
+On a different note, you would have more data points in your analysis if you had selected a day earlier in the month. See your line chart from problem 4. By picking a date with fewer data points, you are making it harder for yourself to discern patterns. 
 
 ```
 
