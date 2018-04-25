@@ -42,8 +42,8 @@ var color = d3.scaleThreshold()
     .range(d3.schemeBlues[5]);
 
 d3.queue()
-    .defer(d3.json, "boston_neigh.json")
-    .defer(d3.csv, "boston_311_totals.csv")
+    .defer(d3.json, "../data/boston_neigh.json")
+    .defer(d3.csv, "../data/boston_311_totals.csv")
     .await(ready);
 
 function ready(error, neigh, bos311) {
