@@ -62,6 +62,8 @@ def newrandint(max,min=0):
 
 assert(0 <= newrandint(100, min = 0) <= 500)
 
+## COMMENT FROM PH: remember to include a call for your function to complete your function. see next line.
+newrandint(1000,)
 
 ## D. String Formatting Function
 def winnerbook():
@@ -69,7 +71,7 @@ def winnerbook():
     book = str(input("Enter a title: ")).title()
     print(f"The number {n} bestseller today is: {book}.")
 winnerbook()
-
+## COMMENT FROM PHOEBE: perfect function. logically, it might make sense to have the user enter the book title before the number, but not necessary!
 
 ## E. Password Validation Function
 def password_test():
