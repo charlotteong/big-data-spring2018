@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>I'm Learning D3</title>
+	<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+	<style>
+		button {
+			position: absolute;
+			margin-left: 6px;
+			margin-top: 6px;
+		}
+	</style>
+</head>
+<body>
+	<button id="start">Transition</button>
+	<button id="reset" style="margin-left: 82px">Reset</button>
+	<!-- Location for page elements. -->
+<script>
+	//Make an SVG Container
+	var svgContainer = d3.select("body").append("svg")
+		.attr("width", 400)
+		.attr("height", 200)
+		.style("border-color", "black")
+		.style("border-style", "solid")
+		.style("border-width", "1px");
+
+	// Draw the Rectangle
+	var rectangle = svgContainer.append("rect")
+		.attr("x", 50)
+		.attr("y", 50)
+		.attr("width", 50)
+		.attr("height", 50);
+
+		d3.select("#start").on("click", function() {
+			rectangle
+				.transition()
+				.attr("x", 250)// New Position
+				.attr("width", 100) // New Width
+				.attr("height", 100) // New Height
+				.attr("opacity", 0.5) //New opacity
+				.attr("fill", "red") // New Color (Hex, RGB, or Web Safe)
+				.delay(500) // Delay 500ms (0.5 seconds). Delay is in milliseconds (ms), and the default is no delay.
+				.duration(2500) // Set Duration of 5000ms (5 seconds). Duration is in milliseconds (ms), and the default is 250ms.
+				.ease(d3.easeBounce) // Use the Transition Ease
+				.on("end",function() { // on end of transition...
+				    d3.select(this)
+				    	.transition() // second transition
+							.attr("x", 150) // second x
+							.attr("width", 75) // second width
+							.attr("height", 75) // second height
+							.attr("opacity", 0.75) // second opacity
+							.attr("fill", "blue") // second color
+							.delay(500) // second delay
+							.duration(2500) // second time
+							.ease(d3.easeBounce); // second ease
+						});
+				});
+
+		// Set up the reset button to move it back to 50
+		d3.select("#reset").on("click", function() {
+			rectangle
+				.transition()
+				.attr("x", 50)
+				.attr("width", 50) // reset Width
+				.attr("height", 50) // reset Height
+				.attr("opacity", 1.0) // reset opacity
+				.attr("fill", "black"); // reset Color (Hex, RGB, or Web Safe)
+		});
+
+
+</script>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<style>
+.neighborhoods {
+  fill: none;
+}
+
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+}
+</style>
+</head>
+
+<body>
+
+<svg width="960" height="600"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+
+<script>
+    var svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+
+    var boston_311_totals = d3.map();
+
+    var albersProjection = d3.geoAlbers()
+        .scale( 190000 )
+        .rotate( [71.057,0] )
+        .center( [0, 42.313] )
+        .translate( [width/2,height/2] );
+
+    var path = d3.geoPath()
+        .projection( albersProjection );
+
+    var x = d3.scaleLinear()
+        .domain([0, 0.5])
+        .rangeRound([100, 400]);
+
+    var color = d3.scaleThreshold()
+        .domain([0,0.1,0.2,0.3,0.4])
+        .range(d3.schemeBlues[5]);
+
+    var label = color.domain()
+
+    var g = svg.append("g")
+        .attr("class", "key")
+        .attr("transform", "translate(0,40)");
+
+    g.selectAll("rect")
+      .data(color.range().map(function(d) {
+          d = color.invertExtent(d);
+          if (d[0] == null) d[0] = x.domain()[0];
+          if (d[1] == null) d[1] = x.domain()[1];
+          return d;
+        }))
+      .enter().append("rect")
+        .attr("height", 8)
+        .attr("x", function(d) { return x(d[0]); })
+        .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+        .attr("fill", function(d) { return color(d[0]); });
+
+    g.append("text")
+        .attr("class", "caption")
+        .attr("x", x.range()[0])
+        .attr("y", -6)
+        .attr("fill", "#000")
+        .attr("text-anchor", "start")
+        .attr("font-weight", "bold")
+        .text("% 311 requests by neighborhood");
+
+    g.call(d3.axisBottom(x)
+        .tickSize(13)
+        .tickFormat(function(x, i) { return i ? x : x + "%"; })
+        .tickValues(label.slice(0,-1)))
+      .select(".domain")
+        .remove();
+
+d3.queue()
+    .defer(d3.json, "boston_neigh.json")
+    .defer(d3.csv, "boston_311_totals.csv")
+    .await(ready);
+
+function ready(error, neigh, bos311) {
+  if (error) throw error;
+
+  var tweets = {}; // Create empty object for holding dataset
+
+  bos311.forEach(function(d) {
+    tweets[d.Name] = 100*(+d.twit_count/+d.tot_count); // Create property for each ID, give it value from rate
+  });
+
+  svg.append("g")
+    .attr("class", "neighborhoods")
+    .selectAll("path")
+    .data(topojson.feature(neigh, neigh.objects.boston_neigh).features)
+    .enter().append("path")
+      .attr("fill", function(d) {
+        return color(tweets[d.properties.Name]);
+       })
+      .attr("d", path)
+      .on("mouseover", function(d){
+		      return tooltip.style("visibility", "visible")
+            .text(d.properties.Name + ": " + (tweets[d.properties.Name]).toFixed(2) + "%");
+	       })
+	    .on("mousemove", function(d){
+		      return tooltip.style("top", (d3.event.pageY-10)+"px")
+            .style("left",(d3.event.pageX+10)+"px")
+            .text(d.properties.Name + ": " + (tweets[d.properties.Name]).toFixed(2) + "%");
+	       })
+	    .on("mouseout", function(d){
+		      return tooltip.style("visibility", "hidden");
+	    })
+      .append("title").text(function(d) {return tweets[d.properties.Name].toFixed(2) + "%";
+      });
+
+// Create Tooltip and set it to be hidden
+  var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("font-family", "'Open Sans', sans-serif")
+    .style("font-size", "12px")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("background-color", "white")
+    .style("opacity", "0.7")
+    .style("padding", "5px");
+  };
+
+</script>
+</body>
+</html>
